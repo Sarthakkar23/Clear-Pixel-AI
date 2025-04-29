@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Clear Pixel AI - Modern Image Enhancer</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
+
+    * {
+      box-sizing: border-box;
+    }
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: 'Montserrat', sans-serif;
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      color: #f5f5f5;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    header {
+      height: 60px;
+      background: #162f6c;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.8rem;
+      letter-spacing: 2px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+      user-select: none;
+      color: #fff;
+      text-transform: uppercase;
+    }
+
+    .container {
+      flex: 1;
+      display: flex;
+      height: calc(100% - 60px);
+      margin: 20px;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+      background: #0f1c3f;
+    }
+
+    .sidebar {
+      width: 320px;
+      background: #1a2a6c;
+      padding: 30px 25px;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      border-right: 3px solid #3a4dbf;
+      transition: background 0.3s ease;
+    }
+
+    .sidebar:hover {
+      background: #2a3a8f;
+    }
+
+    .section {
+      margin-bottom: 40px;
+    }
+
+    .section h2 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      border-bottom: 3px solid #5a6fff;
+      padding-bottom: 10px;
+      color: #c0c8ff;
+      letter-spacing: 1px;
+      user-select: none;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 10px;
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: #a0a8c0;
+      user-select: none;
+    }
+
+    input[type="file"],
+    select,
+    button,
+    input[type="range"] {
+      width: 100%;
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      background-color: #2a3a8f;
+      color: #e0e8ff;
+      box-shadow: inset 0 2px 5px rgba(0,0,0,0.4);
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    input[type="file"]:hover,
+    select:hover,
+    button:hover,
+    input[type="range"]:hover {
+      background-color: #3a4dbf;
+      box-shadow: inset 0 3px 7px rgba(0,0,0,0.6);
+    }
+
+    input[type="file"]:focus,
+    select:focus,
+    button:focus,
+    input[type="range"]:focus {
+      outline: none;
+      background-color: #5a6fff;
+      box-shadow: 0 0 12px #7a8fff;
+      color: #fff;
+    }
+
+    button {
+      background: linear-gradient(90deg, #5a6fff 0%, #3a4dbf 100%);
+      font-weight: 700;
+      box-shadow: 0 6px 15px rgba(90,111,255,0.8);
+      border: none;
+      transition: background 0.4s ease, box-shadow 0.4s ease;
+    }
+
+    button:disabled {
+      background: #555577;
+      box-shadow: none;
+      cursor: not-allowed;
+      color: #999;
+    }
+
+    button:hover:not(:disabled) {
+      background: linear-gradient(90deg, #3a4dbf 0%, #5a6fff 100%);
+      box-shadow: 0 8px 20px rgba(58,77,191,0.9);
+    }
+
+    .content {
+      flex: 1;
+      background: #121c3f;
+      padding: 40px 30px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      border-radius: 0 15px 15px 0;
+      user-select: none;
+      box-shadow: inset 0 0 40px rgba(0,0,0,0.5);
+    }
+
+    .title {
+      font-size: 2.2rem;
+      font-weight: 900;
+      margin-bottom: 30px;
+      color: #c0c8ff;
+      letter-spacing: 1.5px;
+      user-select: none;
+      text-shadow: 0 0 15px rgba(90,111,255,0.9);
+    }
+
+    .image-row {
+      display: flex;
+      gap: 50px;
+      width: 100%;
+      max-width: 900px;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .image-box {
+      flex: 1;
+      text-align: center;
+    }
+
+    .image-box h3 {
+      font-weight: 700;
+      color: #a0a8c0;
+      margin-bottom: 15px;
+      user-select: none;
+    }
+
+    .image-preview {
+      width: 100%;
+      border-radius: 15px;
+      box-shadow: 0 10px 40px rgba(90,111,255,0.6);
+      transition: transform 0.5s ease, box-shadow 0.5s ease;
+      cursor: default;
+    }
+
+    .image-preview:hover {
+      transform: scale(1.07);
+      box-shadow: 0 14px 50px rgba(90,111,255,0.9);
+    }
+
+    /* Drag & Drop */
+    .drop-zone {
+      border: 3px dashed #5a6fff;
+      border-radius: 15px;
+      padding: 50px 25px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: #a0a8c0;
+      cursor: pointer;
+      user-select: none;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+      margin-bottom: 30px;
+    }
+
+    .drop-zone.dragover {
+      background-color: #3a4dbf;
+      border-color: #2a3a8f;
+      color: #e0e8ff;
+    }
+
+    /* Slider styles */
+    .slider-container {
+      margin-bottom: 30px;
+    }
+
+    .slider-label {
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: #a0a8c0;
+      user-select: none;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 10px;
+      border-radius: 6px;
+      background: #3a4dbf;
+      outline: none;
+      opacity: 0.95;
+      transition: opacity 0.2s;
+      cursor: pointer;
+    }
+
+    input[type="range"]:hover {
+      opacity: 1;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #5a6fff;
+      cursor: pointer;
+      box-shadow: 0 0 8px rgba(90,111,255,0.8);
+      transition: background 0.3s ease;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      background: #7a8fff;
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #5a6fff;
+      cursor: pointer;
+      box-shadow: 0 0 8px rgba(90,111,255,0.8);
+      transition: background 0.3s ease;
+    }
+
+    input[type="range"]::-moz-range-thumb:hover {
+      background: #7a8fff;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    Clear Pixel AI - Modern Image Enhancer
+  </header>
+  <div class="container">
+    <div class="sidebar">
+      <div class="section" id="uploadSection">
+        <h2>Upload Image</h2>
+        <div class="drop-zone" id="uploadDropZone">
+          Drag & Drop an image here or click to select
+          <input type="file" id="uploadDropInput" accept="image/*" style="display:none" />
+        </div>
+        <form id="uploadEditForm" enctype="multipart/form-data">
+          <label for="uploadEditImage">Select an image</label>
+          <input type="file" name="image" id="uploadEditImage" required />
+          <label for="operation">Operation</label>
+          <select id="operation" name="operation" required>
+            <option value="denoise">Denoise (OpenCV)</option>
+            <option value="restore">Restore (Enhanced)</option>
+            <option value="filter">Filter (Blur, Sharpen, Median)</option>
+            <option value="edge">Edge Detection (Canny)</option>
+            <option value="super_resolve">Super Resolution (Resize)</option>
+            <option value="inpaint">Inpainting (Telea)</option>
+            <option value="sepia">Sepia Tone</option>
+            <option value="negative">Negative</option>
+            <option value="emboss">Emboss</option>
+            <option value="cartoon">Cartoonify</option>
+          </select>
+
+          <div id="filterTypeDiv" style="display:none;">
+            <label for="filterType">Filter Type</label>
+            <select id="filterType" name="filter_type">
+              <option value="blur">Blur</option>
+              <option value="sharpen">Sharpen</option>
+              <option value="median">Median</option>
+            </select>
+          </div>
+
+          <div id="edgeMethodDiv" style="display:none;">
+            <label for="edgeMethod">Edge Detection Method</label>
+            <select id="edgeMethod" name="edge_method">
+              <option value="canny">Canny (Classical)</option>
+            </select>
+          </div>
+
+          <div id="maskDiv" style="display:none;">
+            <label for="mask">Mask Image (for Inpainting)</label>
+            <input type="file" name="mask" id="mask" />
+          </div>
+
+          <div class="slider-container" id="effectIntensityDiv" style="display:none;">
+            <label for="effectIntensity" class="slider-label">Effect Intensity</label>
+            <input type="range" id="effectIntensity" name="effect_intensity" min="0" max="100" value="50" />
+          </div>
+
+          <button type="submit">Apply</button>
+        </form>
+      </div>
+      <div class="section" id="exportSection">
+        <h2>Export Image</h2>
+        <label for="exportFormat">Select Format</label>
+        <select id="exportFormat">
+          <option value="png">PNG</option>
+          <option value="jpeg">JPEG</option>
+          <option value="webp">WebP</option>
+        </select>
+        <button id="exportBtn" disabled>Download Image</button>
+      </div>
+    </div>
+    <div class="content">
+      <h1 class="title">Image Preview</h1>
+      <div class="image-row">
+        <div class="image-box">
+          <h3>Original Image</h3>
+          <img id="originalImagePreview" class="image-preview" alt="Original Image" />
+        </div>
+        <div class="image-box">
+          <h3>Processed Image</h3>
+          <img id="uploadEditResult" class="image-preview" alt="Processed Image" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Drag & drop upload
+    const uploadDropZone = document.getElementById('uploadDropZone');
+    const uploadDropInput = document.getElementById('uploadDropInput');
+    const imageInput = document.getElementById('uploadEditImage');
+    const originalImagePreview = document.getElementById('originalImagePreview');
+    const uploadEditResult = document.getElementById('uploadEditResult');
+    const exportFormatSelect = document.getElementById('exportFormat');
+    const exportBtn = document.getElementById('exportBtn');
+
+    uploadDropZone.addEventListener('click', () => {
+      uploadDropInput.click();
+    });
+
+    uploadDropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadDropZone.classList.add('dragover');
+    });
+
+    uploadDropZone.addEventListener('dragleave', () => {
+      uploadDropZone.classList.remove('dragover');
+    });
+
+    uploadDropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadDropZone.classList.remove('dragover');
+      if (e.dataTransfer.files.length) {
+        uploadDropInput.files = e.dataTransfer.files;
+        imageInput.files = e.dataTransfer.files;
+        updateOriginalImagePreview();
+      }
+    });
+
+    uploadDropInput.addEventListener('change', () => {
+      imageInput.files = uploadDropInput.files;
+      updateOriginalImagePreview();
+    });
+
+    imageInput.addEventListener('change', () => {
+      updateOriginalImagePreview();
+    });
+
+    function updateOriginalImagePreview() {
+      const file = imageInput.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          originalImagePreview.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      } else {
+        originalImagePreview.src = '';
+      }
+    }
+
+    // Show/hide filter, edge method, mask, and intensity inputs based on operation
+    const operationSelect = document.getElementById('operation');
+    const filterTypeDiv = document.getElementById('filterTypeDiv');
+    const edgeMethodDiv = document.getElementById('edgeMethodDiv');
+    const maskDiv = document.getElementById('maskDiv');
+    const effectIntensityDiv = document.getElementById('effectIntensityDiv');
+
+    operationSelect.addEventListener('change', () => {
+      const op = operationSelect.value;
+      filterTypeDiv.style.display = (op === 'filter') ? 'block' : 'none';
+      edgeMethodDiv.style.display = (op === 'edge') ? 'block' : 'none';
+      maskDiv.style.display = (op === 'inpaint') ? 'block' : 'none';
+      effectIntensityDiv.style.display = (['sepia', 'negative', 'emboss', 'cartoon'].includes(op)) ? 'block' : 'none';
+    });
+
+    // Form submission and image processing
+    const uploadEditForm = document.getElementById('uploadEditForm');
+
+    uploadEditForm.onsubmit = async (e) => {
+      e.preventDefault();
+      const formData = new FormData(uploadEditForm);
+
+      let url = '/process';
+      if (formData.get('operation') === 'super_resolve') {
+        url = '/super_resolve';
+      } else if (formData.get('operation') === 'inpaint') {
+        url = '/inpaint';
+      }
+
+      const response = await fetch(url, {
+        method: 'POST',
+        body: formData
+      });
+
+      if (response.ok) {
+        const blob = await response.blob();
+        const imgUrl = URL.createObjectURL(blob);
+        uploadEditResult.src = '';
+        uploadEditResult.src = imgUrl;
+        uploadEditResult.onload = () => {
+          URL.revokeObjectURL(imgUrl);
+        };
+        exportBtn.disabled = false;
+      } else {
+        alert('Processing failed! Try a different image or operation.');
+      }
+    };
+
+    // Export button click handler
+    exportBtn.addEventListener('click', () => {
+      if (!uploadEditResult.src) {
+        alert('No processed image to export.');
+        return;
+      }
+      const format = exportFormatSelect.value;
+      convertAndDownloadImage(uploadEditResult, format);
+    });
+
+    // Convert image to selected format and trigger download
+    function convertAndDownloadImage(imgElement, format) {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = imgElement.naturalWidth;
+      canvas.height = imgElement.naturalHeight;
+      ctx.drawImage(imgElement, 0, 0);
+
+      canvas.toBlob((blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `processed_image.${format}`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      }, `image/${format}`);
+    }
+  </script>
+</body>
+</html>
